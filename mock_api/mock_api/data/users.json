@@ -1,0 +1,22 @@
+[
+  {
+    "user_id": "USR20250701104700",
+    "username": "user_name.(let's.assume.john.doe)",
+    "full_name": "user_name (let's assume John Doe)",
+    "email": "user_name.(let's.assume.john.doe)@astra.com",
+    "department": "IT",
+    "password": "Astra2024!",
+    "created_at": "2025-07-01T10:47:00.807171",
+    "status": "active"
+  },
+  {
+    "user_id": "USR20250701113008",
+    "username": "'andi'",
+    "full_name": "'Andi'",
+    "email": "'andi'@astra.com",
+    "department": "IT",
+    "password": "Astra2024!",
+    "created_at": "2025-07-01T11:30:08.111361",
+    "status": "active"
+  }
+]
