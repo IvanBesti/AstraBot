@@ -237,7 +237,7 @@ def display_chat_message(message, is_user=True):
     if is_user:
         st.markdown(f"""
         <div class="chat-message user-message">
-            <strong>👤 Anda:</strong><br>
+            <strong>👤 You:</strong><br>
             {message['content']}
             <div class="message-time">{message['timestamp']}</div>
         </div>
@@ -259,14 +259,14 @@ def main():
     
     # Sidebar
     with st.sidebar:
-        st.markdown('<div class="sidebar-header">⚙️ Konfigurasi</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-header">⚙️ Configuration</div>', unsafe_allow_html=True)
         
         # User name input
         user_name = st.text_input(
-            "Nama Anda",
+            "Your Name",
             value=st.session_state.user_name,
             key="user_name",
-            help="Masukkan nama Anda untuk personalisasi"
+            help="Enter your name for personalization"
         )
         
         if user_name != st.session_state.user_name:
@@ -275,30 +275,30 @@ def main():
         st.divider()
         
         # Quick actions
-        st.markdown('<div class="sidebar-header">🚀 Aksi Cepat</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-header">🚀 Quick Actions</div>', unsafe_allow_html=True)
         
-        if st.button("🗑️ Bersihkan Chat"):
+        if st.button("🗑️ Clear Chat"):
             st.session_state.messages = []
             if st.session_state.chatbot:
                 st.session_state.chatbot.clear_history()
             st.rerun()
         
-        if st.button("📊 Lihat Tiket"):
+        if st.button("📊 View Tickets"):
             st.session_state.show_tickets = True
         
-        if st.button("📁 Lihat File"):
+        if st.button("📁 View Files"):
             st.session_state.show_files = True
         
         st.divider()
         
         # Help section
-        st.markdown('<div class="sidebar-header">❓ Bantuan</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-header">❓ Help</div>', unsafe_allow_html=True)
         st.markdown("""
-        **Contoh pertanyaan:**
-        - "Saya tidak bisa login ke portal HRIS"
-        - "Buatkan akun untuk karyawan baru bernama Andi"
-        - "Saya ingin unduh laporan absensi Juni"
-        - "Cek status tiket TCK1234567890"
+        **Example questions:**
+        - "I can't log in to the HRIS portal"
+        - "Create an account for a new employee named Andi"
+        - "I want to download the June attendance report"
+        - "Check the status of ticket TCK1234567890"
         """)
     
     # Main content
@@ -306,22 +306,22 @@ def main():
     
     # Check if chatbot is initialized
     if not st.session_state.chatbot:
-        st.error("Chatbot gagal diinisialisasi. Silakan hubungi admin.\n" + st.session_state.get('init_error', ''))
+        st.error("Chatbot failed to initialize. Please contact admin.\n" + st.session_state.get('init_error', ''))
         return
     
     # Display tickets if requested
     if st.session_state.get('show_tickets', False):
-        st.subheader("📊 Daftar Tiket")
+        st.subheader("📊 Ticket List")
         
         # Navigation buttons
         col1, col2, col3 = st.columns([1, 1, 1])
         with col1:
-            if st.button("🏠 Kembali ke Chat"):
+            if st.button("🏠 Back to Chat"):
                 st.session_state.show_tickets = False
                 st.session_state.show_files = False
                 st.rerun()
         with col2:
-            if st.button("📁 Lihat File"):
+            if st.button("📁 View Files"):
                 st.session_state.show_tickets = False
                 st.session_state.show_files = True
                 st.rerun()
@@ -339,28 +339,28 @@ def main():
                     <strong>ID: {ticket['ticket_id']}</strong><br>
                     <strong>Status:</strong> {ticket['status']}<br>
                     <strong>User:</strong> {ticket['user_name']}<br>
-                    <strong>Deskripsi:</strong> {ticket['issue_description']}<br>
-                    <strong>Dibuat:</strong> {ticket['created_at']}
+                    <strong>Description:</strong> {ticket['issue_description']}<br>
+                    <strong>Created:</strong> {ticket['created_at']}
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("Belum ada tiket yang dibuat.")
+            st.info("No tickets have been created yet.")
         
         return
     
     # Display files if requested
     if st.session_state.get('show_files', False):
-        st.subheader("📁 File yang Tersedia")
+        st.subheader("📁 Available Files")
         
         # Navigation buttons
         col1, col2, col3 = st.columns([1, 1, 1])
         with col1:
-            if st.button("🏠 Kembali ke Chat"):
+            if st.button("🏠 Back to Chat"):
                 st.session_state.show_tickets = False
                 st.session_state.show_files = False
                 st.rerun()
         with col2:
-            if st.button("📊 Lihat Tiket"):
+            if st.button("📊 View Tickets"):
                 st.session_state.show_tickets = True
                 st.session_state.show_files = False
                 st.rerun()
@@ -393,20 +393,20 @@ def main():
                 
                 st.markdown("</div></div></div>", unsafe_allow_html=True)
         else:
-            st.info("Tidak ada file yang tersedia untuk download.")
+            st.info("No files are currently available for download.")
         
         return
     
     # Chat interface
-    st.markdown("### 💬 Chat dengan AstraBot")
+    st.markdown("### 💬 Chat with AstraBot")
     
-    # Template pertanyaan untuk memudahkan user
-    st.markdown("**📋 Template Pertanyaan Cepat:**")
+    # Template questions for user convenience
+    st.markdown("**📋 Quick Question Templates:**")
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🔧 Buat Tiket Masalah"):
-            user_input = "Saya ingin membuat tiket untuk masalah printer yang tidak berfungsi"
+        if st.button("🔧 Create Issue Ticket"):
+            user_input = "I want to create a ticket for a printer issue that is not working"
             # Add user message to history
             user_message = {
                 'content': user_input,
@@ -416,7 +416,7 @@ def main():
             st.session_state.messages.append(user_message)
             
             # Process with chatbot
-            with st.spinner("AstraBot sedang memproses..."):
+            with st.spinner("AstraBot is processing..."):
                 try:
                     # Use chat method for both AstraBot and DummyBot
                     if hasattr(st.session_state.chatbot, 'process_message'):
@@ -438,15 +438,15 @@ def main():
                     
                 except Exception as e:
                     error_message = {
-                        'content': f"Maaf, terjadi kesalahan: {str(e)}",
+                        'content': f"Sorry, an error occurred: {str(e)}",
                         'is_user': False,
                         'timestamp': datetime.now().strftime("%H:%M:%S")
                     }
                     st.session_state.messages.append(error_message)
             st.rerun()
         
-        if st.button("👤 Buat Akun Karyawan"):
-            user_input = "Buatkan akun untuk karyawan baru bernama Andi dari departemen Marketing"
+        if st.button("👤 Create Employee Account"):
+            user_input = "Create an account for a new employee named Andi from the Marketing department"
             # Add user message to history
             user_message = {
                 'content': user_input,
@@ -456,7 +456,7 @@ def main():
             st.session_state.messages.append(user_message)
             
             # Process with chatbot
-            with st.spinner("AstraBot sedang memproses..."):
+            with st.spinner("AstraBot is processing..."):
                 try:
                     # Use chat method for both AstraBot and DummyBot
                     if hasattr(st.session_state.chatbot, 'process_message'):
@@ -478,7 +478,7 @@ def main():
                     
                 except Exception as e:
                     error_message = {
-                        'content': f"Maaf, terjadi kesalahan: {str(e)}",
+                        'content': f"Sorry, an error occurred: {str(e)}",
                         'is_user': False,
                         'timestamp': datetime.now().strftime("%H:%M:%S")
                     }
@@ -486,8 +486,8 @@ def main():
             st.rerun()
     
     with col2:
-        if st.button("📊 Download Laporan"):
-            user_input = "Saya ingin download laporan absensi bulan Juni"
+        if st.button("📊 Download Report"):
+            user_input = "I want to download the June attendance report"
             # Add user message to history
             user_message = {
                 'content': user_input,
@@ -497,7 +497,7 @@ def main():
             st.session_state.messages.append(user_message)
             
             # Process with chatbot
-            with st.spinner("AstraBot sedang memproses..."):
+            with st.spinner("AstraBot is processing..."):
                 try:
                     # Use chat method for both AstraBot and DummyBot
                     if hasattr(st.session_state.chatbot, 'process_message'):
@@ -519,15 +519,15 @@ def main():
                     
                 except Exception as e:
                     error_message = {
-                        'content': f"Maaf, terjadi kesalahan: {str(e)}",
+                        'content': f"Sorry, an error occurred: {str(e)}",
                         'is_user': False,
                         'timestamp': datetime.now().strftime("%H:%M:%S")
                     }
                     st.session_state.messages.append(error_message)
             st.rerun()
         
-        if st.button("📋 Cek Status Tiket"):
-            user_input = "Cek status tiket saya yang terakhir"
+        if st.button("📋 Check Ticket Status"):
+            user_input = "Check the status of my latest ticket"
             # Add user message to history
             user_message = {
                 'content': user_input,
@@ -537,7 +537,7 @@ def main():
             st.session_state.messages.append(user_message)
             
             # Process with chatbot
-            with st.spinner("AstraBot sedang memproses..."):
+            with st.spinner("AstraBot is processing..."):
                 try:
                     # Use chat method for both AstraBot and DummyBot
                     if hasattr(st.session_state.chatbot, 'process_message'):
@@ -559,7 +559,7 @@ def main():
                     
                 except Exception as e:
                     error_message = {
-                        'content': f"Maaf, terjadi kesalahan: {str(e)}",
+                        'content': f"Sorry, an error occurred: {str(e)}",
                         'is_user': False,
                         'timestamp': datetime.now().strftime("%H:%M:%S")
                     }
@@ -575,7 +575,7 @@ def main():
     
     # Chat input
     with st.container():
-        user_input = st.chat_input("Ketik pesan Anda di sini atau gunakan template di atas...")
+        user_input = st.chat_input("Type your message here or use the templates above...")
         
         if user_input:
             # Add user message to history
@@ -587,7 +587,7 @@ def main():
             st.session_state.messages.append(user_message)
             
             # Process with chatbot
-            with st.spinner("AstraBot sedang memproses..."):
+            with st.spinner("AstraBot is processing..."):
                 try:
                     # Use chat method for both AstraBot and DummyBot
                     if hasattr(st.session_state.chatbot, 'process_message'):
@@ -609,7 +609,7 @@ def main():
                     
                 except Exception as e:
                     error_message = {
-                        'content': f"Maaf, terjadi kesalahan: {str(e)}",
+                        'content': f"Sorry, an error occurred: {str(e)}",
                         'is_user': False,
                         'timestamp': datetime.now().strftime("%H:%M:%S")
                     }

@@ -14,10 +14,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Get API keys from environment variables
+# Get OpenRouter API key from environment variables
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_openrouter_api_key_here")
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "your_mistral_api_key_here")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "your_groq_api_key_here")
 
 class DummyBot:
     def __init__(self):
@@ -28,32 +26,32 @@ class DummyBot:
         message_lower = message.lower()
         
         if any(word in message_lower for word in ['halo', 'hai', 'hello', 'hi']):
-            return "Halo! Saya AstraBot, asisten IT internal. Bagaimana saya bisa membantu Anda hari ini? 😊"
+            return "Hello! I'm AstraBot, your internal IT assistant. How can I help you today? 😊"
         
         elif any(word in message_lower for word in ['tiket', 'masalah', 'error', 'bug', 'trouble']):
-            return "Untuk membuat tiket, silakan berikan detail masalah Anda. Contoh: 'Saya tidak bisa login ke portal HRIS' atau 'Printer di lantai 3 tidak berfungsi'."
+            return "To create a ticket, please provide the details of your issue. Example: 'I can't log in to the HRIS portal' or 'The printer on the 3rd floor is not working.'"
         
         elif any(word in message_lower for word in ['akun', 'account', 'user', 'karyawan baru']):
-            return "Untuk pembuatan akun, silakan berikan nama dan departemen karyawan baru. Contoh: 'Buatkan akun untuk Dinda dari departemen Marketing'."
+            return "To create an account, please provide the name and department of the new employee. Example: 'Create an account for Dinda from the Marketing department.'"
         
         elif any(word in message_lower for word in ['download', 'unduh', 'laporan', 'data', 'file']):
-            return "Untuk mengunduh data, silakan pilih jenis laporan yang Anda butuhkan. Saya bisa membantu dengan laporan HR, keuangan, atau data teknis."
+            return "To download data, please select the type of report you need. I can help with HR reports, finance, or technical data."
         
         elif any(word in message_lower for word in ['status', 'cek', 'check', 'tiket saya']):
-            return "Untuk mengecek status tiket, silakan berikan nomor tiket Anda atau nama Anda yang terdaftar."
+            return "To check ticket status, please provide your ticket number or your registered name."
         
         elif any(word in message_lower for word in ['bantuan', 'help', 'tolong', 'apa yang bisa']):
-            return """Saya AstraBot, asisten IT internal yang bisa membantu Anda dengan:
+            return """I'm AstraBot, your internal IT assistant who can help you with:
 
-🔧 **Membuat Tiket** - Laporkan masalah teknis
-👤 **Pembuatan Akun** - Buat akun untuk karyawan baru  
-📊 **Download Data** - Unduh laporan dan file
-📋 **Cek Status** - Lihat status tiket Anda
+🔧 **Create Ticket** - Report technical issues
+👤 **Create Account** - Create an account for a new employee  
+📊 **Download Data** - Download reports and files
+📋 **Check Status** - View your ticket status
 
-Silakan pilih layanan yang Anda butuhkan! 😊"""
+Please select the service you need! 😊"""
         
         else:
-            return "Terima kasih atas pesannya! Saya AstraBot, asisten IT internal. Saya bisa membantu dengan pembuatan tiket, akun, download data, dan cek status. Ada yang bisa saya bantu? 😊"
+            return "Thank you for your message! I'm AstraBot, your internal IT assistant. I can help with ticket creation, account creation, data download, and status checking. How can I assist you? 😊"
     
     def clear_history(self):
         self.chat_history = []
@@ -72,60 +70,31 @@ class AstraBot:
         self._init_llm()
 
     def _init_llm(self):
-        """Initialize LLM with error handling and multiple providers"""
-        # Try OpenRouter first (recommended)
-        if OPENROUTER_API_KEY and OPENROUTER_API_KEY != "your_openrouter_api_key_here":
-            try:
-                llm_kwargs = {
-                    "model": "mistralai/mistral-7b-instruct",
-                    "temperature": 0.7,
-                    "openai_api_key": OPENROUTER_API_KEY,
-                    "openai_api_base": "https://openrouter.ai/api/v1"
-                }
-                self.llm = ChatOpenAI(**llm_kwargs)
-                # Test the LLM connection
-                test_response = self.llm.invoke("Hello")
-                print("LLM connection successful with OpenRouter")
-                self.agent = self._create_agent()
-                return
-            except Exception as e:
-                print(f"Error initializing LLM with OpenRouter: {e}")
-        
-        # Try Mistral AI directly
-        if MISTRAL_API_KEY and MISTRAL_API_KEY != "your_mistral_api_key_here":
-            try:
-                from langchain_mistralai import ChatMistralAI
-                self.llm = ChatMistralAI(
-                    model="mistral-small-latest",
-                    mistral_api_key=MISTRAL_API_KEY
-                )
-                test_response = self.llm.invoke("Hello")
-                print("LLM connection successful with Mistral")
-                self.agent = self._create_agent()
-                return
-            except Exception as e:
-                print(f"Error initializing LLM with Mistral: {e}")
-        
-        # Try Groq
-        if GROQ_API_KEY and GROQ_API_KEY != "your_groq_api_key_here":
-            try:
-                from langchain_groq import ChatGroq
-                self.llm = ChatGroq(
-                    model="llama3-8b-8192",
-                    groq_api_key=GROQ_API_KEY
-                )
-                test_response = self.llm.invoke("Hello")
-                print("LLM connection successful with Groq")
-                self.agent = self._create_agent()
-                return
-            except Exception as e:
-                print(f"Error initializing LLM with Groq: {e}")
-        
-        # Fallback to demo mode
-        print("No valid API keys found. Using demo mode.")
-        self.llm = None
-        self.agent = None
-        self.dummy = DummyBot()
+        """Initialize LLM with OpenRouter only"""
+        if not self.api_key or self.api_key == "your_openrouter_api_key_here":
+            print("API key OpenRouter belum diset. Menggunakan demo mode.")
+            self.llm = None
+            self.agent = None
+            self.dummy = DummyBot()
+            return
+        try:
+            llm_kwargs = {
+                "model": self.model,
+                "temperature": 0.7,
+                "openai_api_key": self.api_key,
+                "openai_api_base": "https://openrouter.ai/api/v1"
+            }
+            self.llm = ChatOpenAI(**llm_kwargs)
+            # Test the LLM connection
+            test_response = self.llm.invoke("Hello")
+            print("LLM connection successful with OpenRouter")
+            self.agent = self._create_agent()
+        except Exception as e:
+            print(f"Error initializing LLM with OpenRouter: {e}")
+            self.llm = None
+            self.agent = None
+            self.dummy = DummyBot()
+            print("Falling back to dummy bot")
 
     def _create_tools(self) -> List[Tool]:
         """Create tools for the agent"""
@@ -134,20 +103,20 @@ class AstraBot:
             """Create a support ticket for user issues"""
             try:
                 ticket = utils.create_ticket(user_name, issue_description)
-                return f"Tiket berhasil dibuat dengan ID {ticket['ticket_id']}. Tim IT akan menghubungi Anda dalam 24 jam."
+                return f"Ticket successfully created with ID {ticket['ticket_id']}. The IT team will contact you within 24 hours."
             except Exception as e:
-                return f"Maaf, terjadi kesalahan saat membuat tiket: {str(e)}"
+                return f"Sorry, an error occurred: {str(e)}"
         
         def create_user_account_tool(full_name: str) -> str:
             """Create user account for new employee"""
             try:
                 result = utils.create_user_account(full_name)
                 if result.get("success"):
-                    return f"Akun untuk {full_name} berhasil dibuat! Username: {result['username']}, Password: {result['password']}"
+                    return f"Account for {full_name} has been successfully created! Username: {result['username']}, Password: {result['password']}"
                 else:
-                    return f"Maaf, gagal membuat akun untuk {full_name}"
+                    return f"Sorry, failed to create account for {full_name}"
             except Exception as e:
-                return f"Maaf, terjadi kesalahan saat membuat akun: {str(e)}"
+                return f"Sorry, an error occurred: {str(e)}"
         
         def get_download_files_tool() -> str:
             """Get available files for download"""
@@ -155,43 +124,65 @@ class AstraBot:
                 files = utils.get_download_files()
                 if files:
                     file_list = "\n".join([f"- {f['filename']} ({f['size']} bytes)" for f in files])
-                    return f"File yang tersedia untuk download:\n{file_list}"
+                    return f"Available files for download:\n{file_list}"
                 else:
-                    return "Tidak ada file yang tersedia untuk download saat ini."
+                    return "No files are currently available for download."
             except Exception as e:
-                return f"Maaf, terjadi kesalahan saat mengambil daftar file: {str(e)}"
+                return f"Sorry, an error occurred: {str(e)}"
         
         def get_ticket_status_tool(ticket_id: str) -> str:
             """Get status of a specific ticket"""
             try:
-                ticket = utils.get_ticket(ticket_id)
+                # Extract only the pure ticket ID (e.g. TCK20250701174707) from the input
+                match = re.search(r'TCK\d{14}', ticket_id)
+                ticket_id_clean = match.group(0) if match else ticket_id.strip(' ",()')
+                ticket = utils.get_ticket(ticket_id_clean)
                 if ticket:
-                    return f"Status tiket {ticket_id}: {ticket['status']}. Deskripsi: {ticket['issue_description']}"
+                    return f"Ticket status {ticket_id_clean}: {ticket['status']}. Description: {ticket['issue_description']}"
                 else:
-                    return f"Tiket {ticket_id} tidak ditemukan."
+                    return f"Ticket {ticket_id_clean} not found."
             except Exception as e:
-                return f"Maaf, terjadi kesalahan saat mencari tiket: {str(e)}"
+                return f"Sorry, an error occurred: {str(e)}"
+        
+        def get_latest_ticket_id_for_user_tool(user_name: str = None) -> str:
+            """Get the latest ticket ID for a user. If user_name is missing or a placeholder, use self.user_name."""
+            try:
+                # Use the chatbot's user_name if input is missing or a placeholder
+                if not user_name or 'current user' in user_name or 'user_name' in user_name:
+                    user_name = getattr(self, 'current_user_name', 'User')
+                ticket_id = utils.get_latest_ticket_id_for_user(user_name)
+                if ticket_id:
+                    return f"The latest ticket ID for user '{user_name}' is {ticket_id}."
+                else:
+                    return f"No tickets found for user '{user_name}'."
+            except Exception as e:
+                return f"Sorry, an error occurred: {str(e)}"
         
         return [
             Tool(
                 name="create_ticket",
-                description="Buat tiket support untuk masalah teknis yang dilaporkan user",
+                description="Create a support ticket for technical issues reported by the user",
                 func=create_ticket_tool
             ),
             Tool(
                 name="create_user_account",
-                description="Buat akun untuk karyawan baru",
+                description="Create an account for a new employee",
                 func=create_user_account_tool
             ),
             Tool(
                 name="get_download_files",
-                description="Dapatkan daftar file yang tersedia untuk download",
+                description="Get a list of files available for download",
                 func=get_download_files_tool
             ),
             Tool(
                 name="get_ticket_status",
-                description="Cek status tiket berdasarkan ID tiket",
+                description="Check ticket status by ticket ID",
                 func=get_ticket_status_tool
+            ),
+            Tool(
+                name="get_latest_ticket_id_for_user",
+                description="Get the latest ticket ID for a given user name",
+                func=get_latest_ticket_id_for_user_tool
             )
         ]
 
@@ -205,14 +196,7 @@ class AstraBot:
             )
             
             # Tambahkan system message untuk bahasa Indonesia
-            system_message = """Kamu adalah AstraBot, asisten IT internal yang membantu karyawan dengan masalah teknis.
-
-PENTING: Selalu jawab dalam bahasa Indonesia yang sopan dan profesional.
-
-Jika user hanya menyapa (halo, hai, hi, hello), jawab dengan ramah dalam bahasa Indonesia seperti:
-"Halo! Saya AstraBot, asisten IT internal. Bagaimana saya bisa membantu Anda hari ini? 😊"
-
-Untuk semua respons lainnya, gunakan bahasa Indonesia yang sopan dan profesional."""
+            system_message = """You are AstraBot, an internal IT assistant who helps employees with technical issues.\n\nIMPORTANT: Always respond in polite and professional English.\n\nIf the user just greets (hello, hi), respond politely in English such as:\n'Hello! I'm AstraBot, your internal IT assistant. How can I help you today? 😊'\n\nFor all other responses, use polite and professional English."""
             
             agent = initialize_agent(
                 tools=self.tools,
@@ -241,12 +225,12 @@ Untuk semua respons lainnya, gunakan bahasa Indonesia yang sopan dan profesional
                 # Fallback ke dummy bot
                 response = self.dummy.chat(message)
             else:
-                response = "Maaf, sistem chatbot sedang tidak tersedia. Silakan coba lagi nanti."
+                response = "Sorry, the chatbot system is currently unavailable. Please try again later."
             
             self.chat_history.append({"user": message, "bot": response})
             return response
         except Exception as e:
-            error_msg = f"Maaf, terjadi kesalahan: {str(e)}"
+            error_msg = f"Sorry, an error occurred: {str(e)}"
             self.chat_history.append({"user": message, "bot": error_msg})
             return error_msg
 
@@ -257,12 +241,14 @@ Untuk semua respons lainnya, gunakan bahasa Indonesia yang sopan dan profesional
                 response = self.llm.invoke(message)
                 return response.content
             else:
-                return "Maaf, LLM tidak tersedia."
+                return "Sorry, the LLM is not available."
         except Exception as e:
-            return f"Error dalam chat-only mode: {str(e)}"
+            return f"Sorry, an error occurred: {str(e)}"
 
     def process_message(self, user_message: str, user_name: str = "User") -> str:
         """Process user message - compatibility method"""
+        # Store the user_name for use in tools
+        self.current_user_name = user_name
         return self.chat(user_message)
 
     def get_chat_history(self) -> List[Dict]:

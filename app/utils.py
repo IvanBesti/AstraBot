@@ -134,7 +134,7 @@ def create_user_account(full_name: str) -> Dict:
                 "username": username,
                 "password": "Astra2024!",
                 "email": f"{username}@astra.com",
-                "message": "Akun berhasil dibuat"
+                "message": "Account successfully created"
             }
     except requests.exceptions.RequestException:
         # Fallback if API is not available
@@ -144,7 +144,7 @@ def create_user_account(full_name: str) -> Dict:
             "username": username,
             "password": "Astra2024!",
             "email": f"{username}@astra.com",
-            "message": "Akun berhasil dibuat (offline mode)"
+            "message": "Account successfully created (offline mode)"
         }
 
 def get_download_files() -> List[Dict]:
@@ -210,4 +210,15 @@ def load_prompts() -> Dict:
     base_dir = os.path.dirname(os.path.abspath(__file__))
     prompts_path = os.path.join(base_dir, "prompts.yaml")
     with open(prompts_path, "r", encoding="utf-8") as file:
-        return yaml.safe_load(file) 
+        return yaml.safe_load(file)
+
+def get_latest_ticket_id_for_user(user_name: str) -> Optional[str]:
+    """Get the ticket_id of the most recently created ticket for a given user_name"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT ticket_id FROM tickets WHERE user_name = ? ORDER BY created_at DESC LIMIT 1', (user_name,))
+    result = cursor.fetchone()
+    conn.close()
+    if result:
+        return result[0]
+    return None 
